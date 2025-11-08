@@ -232,11 +232,11 @@ def render_ascii(contexto, state) -> str:
 
 if __name__ == "__main__":
     grid = """
-#########
-#S .   G#
-#  ##   #
-# . E  .#
-#########
+##############
+#S .        G#
+#  ##   #    #
+# . E  .#    #
+##############
 """.strip("\n")
     
     dfa, contexto = dfa_pacman(grid)
