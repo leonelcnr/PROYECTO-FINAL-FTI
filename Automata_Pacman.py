@@ -34,7 +34,7 @@ def mapa(mapa_str):
             c = filas[y][x]
             if c == '#': paredes.add((x,y))
             elif c == 'S': inicio = (x,y)
-            elif c == 'F': fantasmas.add((x,y))
+            elif c == 'G': fantasmas.add((x,y))
             elif c == '.': pastillas.append((x,y))
             elif c == 'E': meta = (x,y)
             # espacios ' ' son transitables
@@ -241,7 +241,7 @@ if __name__ == "__main__":
     
     dfa, contexto = dfa_pacman(grid)
     turno = Turno(dfa)
-    print(grid)
+    # print(grid)
     
     # while True:
         
