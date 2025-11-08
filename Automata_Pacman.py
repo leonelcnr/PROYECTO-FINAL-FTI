@@ -1,24 +1,6 @@
 from collections import deque
 from automata.fa.dfa import DFA
 
-# dfa = DFA (
-#     states={'q0', 'q1', 'q2'},
-#     input_symbols={'a', 'b'},
-#     transitions={
-#         'q0': {'a': 'q1', 'b': 'q2'},
-#         'q1': {'a': 'q0', 'b': 'q2'},
-#         'q2': {'a': 'q2', 'b': 'q1'}
-#     },
-#     initial_state='q0',
-#     final_states={'q0'}
-# )
-
-# print("acepta") if dfa.accepts_input("aab") else print("no acepta")
-# print("acepta") if dfa.accepts_input("aa") else print("no acepta")
-
-# print(list(dfa.read_input_stepwise("aa")))    
-
-# --------------------
 
 def mapa(mapa_str):
     filas = [list(r) for r in mapa_str.strip("\n").splitlines()]
@@ -52,6 +34,8 @@ def mapa(mapa_str):
     }
     
     
+
+
 def dfa_pacman(mapa_str):
     G = mapa(mapa_str)
     movimientos = {'W': (0,-1), 'S': (0,1), 'A': (-1,0), 'D': (1,0)}
