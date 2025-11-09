@@ -125,7 +125,6 @@ export default function App() {
       g.fillStyle = "#2ecc71";
       g.fillRect(gx * CELL, gy * CELL, CELL, CELL);
     }
-
     const pad = 6;
     if (ghostImg) {
       data.ctx.ghosts.forEach(([x, y]) => {
@@ -136,6 +135,7 @@ export default function App() {
       g.fillStyle = "#bbff00ff";
       data.ctx.ghosts.forEach(([x, y]) => g.fillRect(x * CELL + pad, y * CELL + pad, CELL - 2 * pad, CELL - 2 * pad));
     }
+
     // estado
     const st = parseState(state);
 
