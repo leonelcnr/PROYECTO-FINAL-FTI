@@ -1,22 +1,22 @@
 import { useEffect, useRef, useState } from "react";
 
 type DFAData = {
-  initial: string;
-  finals: string[];
-  alphabet: string[];
-  transitions: Record<string, Record<string, string>>;
+  estado_inicial: string;
+  estados_finales: string[];
+  alfabeto: string[];
+  transiciones: Record<string, Record<string, string>>;
   ctx: {
     w: number;
     h: number;
-    walls: number[][];
-    ghosts: number[][];
-    start: number[];
-    goal: number[] | null;
-    pellets: number[][]; // el índice i define el bit i del mask
+    paredes: number[][];
+    fantasmas: number[][];
+    inicio: number[];
+    meta: number[] | null;
+    pastillas: number[][]; // el índice i define el bit i del mask
   };
 };
 
-function loadImage(url: string) {
+function cargarImagen(url: string) {
   return new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.onload = () => resolve(img);
@@ -26,20 +26,20 @@ function loadImage(url: string) {
 }
 
 function parseState(s: string) {
-  if (s === "MUERTE") return { dead: true } as const;
+  if (s === "MUERTE") return { muerte: true } as const;
   const [pos, maskStr] = s.split("|");
   const [xStr, yStr] = pos.split(",");
-  return { dead: false, x: +xStr, y: +yStr, mask: Number(maskStr) } as const;
+  return { muerte: false, x: +xStr, y: +yStr, mask: Number(maskStr) } as const;
 }
 
-function hasPellet(mask: number, i: number) {
+function tienePastilla(mask: number, i: number) {
   return ((mask >> i) & 1) === 1;
 }
 
 export default function App() {
   const [data, setData] = useState<DFAData | null>(null);
   const [state, setState] = useState<string | null>(null);
-  const [ghostImg, setGhostImg] = useState<HTMLImageElement | null>(null);
+  const [fantasmaImg, setfantasmaImg] = useState<HTMLImageElement | null>(null);
   const [pacmanImg, setPacmanImg] = useState<HTMLImageElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const CELL = 40; // px por celda
@@ -50,17 +50,17 @@ export default function App() {
       .then((r) => r.json())
       .then((d: DFAData) => {
         setData(d);
-        setState(d.initial);
+        setState(d.estado_inicial);
       });
   }, []);
 
 
   useEffect(() => {
-    loadImage("/fantasmas/fantasma1.svg").then(setGhostImg).catch(console.error);
+    cargarImagen("/fantasmas/fantasma1.svg").then(setfantasmaImg).catch(console.error);
   }, []);
 
   useEffect(() => {
-    loadImage("/pacman.svg").then(setPacmanImg).catch(console.error);
+    cargarImagen("/pacman.svg").then(setPacmanImg).catch(console.error);
   }, []);
 
 
@@ -72,11 +72,11 @@ export default function App() {
         const key = e.key.toUpperCase();
         // Reset suave desde MUERTE
         if (key === "R" && state === "MUERTE") {
-          setState(data.initial);
+          setState(data.estado_inicial);
           return;
         }
         if (!["W", "A", "S", "D", "R"].includes(key)) return;
-        const next = data.transitions[state]?.[key];
+        const next = data.transiciones[state]?.[key];
         if (next) setState(next);
       };
       window.addEventListener("keydown", onKey);
@@ -117,33 +117,33 @@ export default function App() {
 
     // paredes
     g.fillStyle = "#4b6cb7";
-    ctx.walls.forEach(([x, y]) => g.fillRect(x * CELL, y * CELL, CELL, CELL));
+    ctx.paredes.forEach(([x, y]) => g.fillRect(x * CELL, y * CELL, CELL, CELL));
 
     // meta
-    if (ctx.goal) {
-      const [gx, gy] = ctx.goal;
+    if (ctx.meta) {
+      const [gx, gy] = ctx.meta;
       g.fillStyle = "#2ecc71";
       g.fillRect(gx * CELL, gy * CELL, CELL, CELL);
     }
     const pad = 6;
-    if (ghostImg) {
-      data.ctx.ghosts.forEach(([x, y]) => {
-        g.drawImage(ghostImg, x * CELL + pad, y * CELL + pad, CELL - 2 * pad, CELL - 2 * pad);
+    if (fantasmaImg) {
+      data.ctx.fantasmas.forEach(([x, y]) => {
+        g.drawImage(fantasmaImg, x * CELL + pad, y * CELL + pad, CELL - 2 * pad, CELL - 2 * pad);
       });
     } else {
       // fallback si no cargó el SVG
       g.fillStyle = "#bbff00ff";
-      data.ctx.ghosts.forEach(([x, y]) => g.fillRect(x * CELL + pad, y * CELL + pad, CELL - 2 * pad, CELL - 2 * pad));
+      data.ctx.fantasmas.forEach(([x, y]) => g.fillRect(x * CELL + pad, y * CELL + pad, CELL - 2 * pad, CELL - 2 * pad));
     }
 
     // estado
     const st = parseState(state);
 
     // pastillas restantes (según mask)
-    if (!st.dead) {
+    if (!st.muerte) {
       g.fillStyle = "#f1c40f";
-      ctx.pellets.forEach(([px, py], i) => {
-        if (hasPellet(st.mask, i)) {
+      ctx.pastillas.forEach(([px, py], i) => {
+        if (tienePastilla(st.mask, i)) {
           g.beginPath();
           g.arc(
             px * CELL + CELL / 2,
@@ -158,13 +158,13 @@ export default function App() {
     }
 
     // inicio (S)
-    const [sx, sy] = ctx.start;
+    const [sx, sy] = ctx.inicio;
     g.fillStyle = "white";
     g.font = "bold 14px sans-serif";
     g.fillText("S", sx * CELL + 6, sy * CELL + 16);
 
     // Pac-Man / estado MUERTE
-    if (st.dead) {
+    if (st.muerte) {
       g.fillStyle = "rgba(231, 76, 60, 0.85)";
       g.fillRect(0, 0, cvs.width, cvs.height);
       g.fillStyle = "#fff";
@@ -178,7 +178,7 @@ export default function App() {
     }
 
     // HUD
-    const ganador = data.finals.includes(state);
+    const ganador = data.estados_finales.includes(state);
     g.fillStyle = "#fff";
     g.font = "14px monospace";
     g.fillText(`Estado: ${state}`, 10, cvs.height - 28);

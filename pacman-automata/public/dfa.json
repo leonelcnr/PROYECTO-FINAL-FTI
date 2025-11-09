@@ -1,8 +1,8 @@
 {
-  "initial": "1,1|7",
-  "finals": ["4,3|0"],
-  "alphabet": ["A", "D", "R", "S", "W"],
-  "transitions": {
+  "estado_inicial": "1,1|7",
+  "estados_finales": ["4,3|0"],
+  "alfabeto": ["A", "D", "R", "S", "W"],
+  "transiciones": {
     "5,1|6": {
       "W": "5,1|6",
       "S": "5,2|6",
@@ -1302,7 +1302,7 @@
   "ctx": {
     "w": 14,
     "h": 5,
-    "walls": [
+    "paredes": [
       [12, 4],
       [4, 0],
       [3, 4],
@@ -1342,10 +1342,10 @@
       [13, 3],
       [6, 0]
     ],
-    "ghosts": [[12, 1]],
-    "start": [1, 1],
-    "goal": [4, 3],
-    "pellets": [
+    "fantasmas": [[12, 1]],
+    "inicio": [1, 1],
+    "meta": [4, 3],
+    "pastillas": [
       [3, 1],
       [2, 3],
       [7, 3]
