@@ -16,14 +16,6 @@ type DFAData = {
 	};
 };
 
-// function cargarImagen(url: string) {
-// 	return new Promise<HTMLImageElement>((resolve, reject) => {
-// 		const img = new Image();
-// 		img.onload = () => resolve(img);
-// 		img.onerror = reject;
-// 		img.src = url; // viene de /public => mismo origen (sin CORS)
-// 	});
-// }
 
 function parseState(s: string) {
 	if (s === "MUERTE") return { muerte: true } as const;
@@ -45,25 +37,16 @@ export default function App() {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const CELL = 55; // px por celda
 
-	// cargar JSON
-	// const res = await fetch(`${import.meta.env.BASE_URL}dfa.json`);
-	// if (!res.ok) {
-	// 	throw new Error('No se pudo cargar dfa.json');
-	// }
-	// const data = await res.json();
 	useEffect(() => {
 		const load = async () => {
 			try {
-				// 👇 SIN /public, usando BASE_URL
 				const res = await fetch(`${import.meta.env.BASE_URL}dfa.json`);
 				if (!res.ok) {
 					throw new Error('No se pudo cargar dfa.json');
 				}
 				const data = await res.json();
-				console.log(data);
 				setData(data);
 				setState(data.estado_inicial);
-				console.log(data.estado_inicial);
 
 				// cargar fantasma
 				const fantasma = new Image();
@@ -84,19 +67,9 @@ export default function App() {
 
 
 
-	// useEffect(() => {
-	// 	cargarImagen("dist/fantasmas/fantasma2.svg").then(setfantasmaImg).catch(console.error);
-	// }, []);
-
-	// useEffect(() => {
-	// 	cargarImagen("dist/pacman.svg").then(setPacmanImg).catch(console.error);
-	// }, []);
-
-
 	// teclado
 	useEffect(
 		() => {
-			console.log("segundo useEffect", data, state);
 			if (!data || !state) return;
 			const onKey = (e: KeyboardEvent) => {
 				const key = e.key.toUpperCase();
