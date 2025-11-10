@@ -10,20 +10,20 @@ def export_dfa_to_json(dfa, ctx, path="../public/dfa.json"):
         return [[x, y] for (x, y) in s]
 
     data = {
-        "initial": _state_str(dfa.initial_state),
-        "finals":  [_state_str(s) for s in dfa.final_states],
-        "alphabet": sorted(list(dfa.input_symbols)),  # ej. ["A","D","S","W"] (+ "R" si lo modelaste)
-        "transitions": {
+        "estado_inicial": _state_str(dfa.initial_state),
+        "estados_finales":  [_state_str(s) for s in dfa.final_states],
+        "alfabeto": sorted(list(dfa.input_symbols)),  # ej. ["A","D","S","W"] (+ "R" si lo modelaste)
+        "transiciones": {
             _state_str(s): {a: _state_str(t) for a, t in dfa.transitions[s].items()}
             for s in dfa.states
         },
         "ctx": {
             "w": ctx["ancho"], "h": ctx["altura"],
-            "walls":   to_list_pairs(ctx["paredes"]),
-            "ghosts":  to_list_pairs(ctx["fantasmas"]),
-            "start":   [ctx["inicio"][0], ctx["inicio"][1]],
-            "goal":    ([ctx["meta"][0], ctx["meta"][1]] if ctx["meta"] is not None else None),
-            "pellets": [[x, y] for (x, y) in ctx["pastillas"]]  # el orden define los bits del mask
+            "paredes":   to_list_pairs(ctx["paredes"]),
+            "fantasmas":  to_list_pairs(ctx["fantasmas"]),
+            "inicio":   [ctx["inicio"][0], ctx["inicio"][1]],
+            "meta":    ([ctx["meta"][0], ctx["meta"][1]] if ctx["meta"] is not None else None),
+            "pastillas": [[x, y] for (x, y) in ctx["pastillas"]]  # el orden define los bits del mask
         }
     }
     with open(path, "w", encoding="utf-8") as f:
