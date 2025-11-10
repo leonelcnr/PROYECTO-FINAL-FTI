@@ -46,7 +46,7 @@ export default function App() {
 
 	// cargar JSON
 	useEffect(() => {
-		fetch("public/dfa.json")
+		fetch("dist/dfa.json")
 			.then((r) => r.json())
 			.then((d: DFAData) => {
 				setData(d);
@@ -56,11 +56,11 @@ export default function App() {
 
 
 	useEffect(() => {
-		cargarImagen("public/fantasmas/fantasma2.svg").then(setfantasmaImg).catch(console.error);
+		cargarImagen("dist/fantasmas/fantasma2.svg").then(setfantasmaImg).catch(console.error);
 	}, []);
 
 	useEffect(() => {
-		cargarImagen("public/pacman.svg").then(setPacmanImg).catch(console.error);
+		cargarImagen("dist/pacman.svg").then(setPacmanImg).catch(console.error);
 	}, []);
 
 
