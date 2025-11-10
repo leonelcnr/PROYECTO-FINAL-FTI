@@ -170,9 +170,11 @@ export default function App() {
 
 		// inicio (S)
 		const [sx, sy] = ctx.inicio;
+		g.fillStyle = "#ffac2fff";
+		g.fillRect(sx * CELL, sy * CELL, CELL, CELL);
 		g.fillStyle = "white";
 		g.font = "bold 14px sans-serif";
-		g.fillText("S", sx * CELL + 6, sy * CELL + 16);
+		g.fillText("", sx * CELL + 6, sy * CELL + 16);
 
 		// Pac-Man / estado MUERTE
 		if (st.muerte) {
