@@ -36,32 +36,58 @@ function tienePastilla(mask: number, i: number) {
 	return ((mask >> i) & 1) === 1;
 }
 
+
 export default function App() {
-	const [data, setData] = useState<DFAData | null>(null);
 	const [state, setState] = useState<string | null>(null);
-	const [fantasmaImg, setfantasmaImg] = useState<HTMLImageElement | null>(null);
+	const [fantasmaImg, setFantasmaImg] = useState<HTMLImageElement | null>(null);
 	const [pacmanImg, setPacmanImg] = useState<HTMLImageElement | null>(null);
+	const [data, setData] = useState<DFAData | null>(null);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const CELL = 55; // px por celda
 
 	// cargar JSON
+	// const res = await fetch(`${import.meta.env.BASE_URL}dfa.json`);
+	// if (!res.ok) {
+	// 	throw new Error('No se pudo cargar dfa.json');
+	// }
+	// const data = await res.json();
 	useEffect(() => {
-		fetch("dist/dfa.json")
-			.then((r) => r.json())
-			.then((d: DFAData) => {
-				setData(d);
-				setState(d.estado_inicial);
-			});
+		const load = async () => {
+			try {
+				// 👇 SIN /public, usando BASE_URL
+				const res = await fetch(`${import.meta.env.BASE_URL}dfa.json`);
+				if (!res.ok) {
+					throw new Error('No se pudo cargar dfa.json');
+				}
+				const data = await res.json();
+				setData(data);
+
+				// cargar fantasma
+				const fantasma = new Image();
+				fantasma.src = `${import.meta.env.BASE_URL}fantasmas/fantasma2.svg`;
+				fantasma.onload = () => setFantasmaImg(fantasma);
+
+				// cargar pacman
+				const pacman = new Image();
+				pacman.src = `${import.meta.env.BASE_URL}pacman.svg`;
+				pacman.onload = () => setPacmanImg(pacman);
+			} catch (err) {
+				console.error(err);
+			}
+		};
+
+		load();
 	}, []);
 
 
-	useEffect(() => {
-		cargarImagen("dist/fantasmas/fantasma2.svg").then(setfantasmaImg).catch(console.error);
-	}, []);
 
-	useEffect(() => {
-		cargarImagen("dist/pacman.svg").then(setPacmanImg).catch(console.error);
-	}, []);
+	// useEffect(() => {
+	// 	cargarImagen("dist/fantasmas/fantasma2.svg").then(setfantasmaImg).catch(console.error);
+	// }, []);
+
+	// useEffect(() => {
+	// 	cargarImagen("dist/pacman.svg").then(setPacmanImg).catch(console.error);
+	// }, []);
 
 
 	// teclado
