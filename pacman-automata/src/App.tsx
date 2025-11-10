@@ -75,7 +75,7 @@ export default function App() {
 					setState(data.estado_inicial);
 					return;
 				}
-				if (key === "R" && state === '13, 5 | 0') {
+				if (key === "R" && state === data.estados_finales[0]) {
 					setState(data.estado_inicial);
 					return;
 				}

@@ -23,8 +23,17 @@ if __name__ == "__main__":
 ###############
 """.strip("\n")
 
+    grid3 = """
+#######################
+#S   .            G  E#
+#  ########       #   #
+# G . ## . G  #####.  #
+#     ##      #       #
+#G               .    #
+#######################
+""".strip("\n")
 
-    dfa, contexto = dfa_pacman(grid2)
+    dfa, contexto = dfa_pacman(grid3)
     export_dfa_to_json(dfa, contexto)
     # turno = Turno(dfa)
     
