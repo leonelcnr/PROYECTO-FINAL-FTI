@@ -1,14 +1,14 @@
 name: Deploy to GitHub Pages
 
 on:
-	push:
-		branches: [ main ]
-	workflow_dispatch:
+  push:
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
-    contents: read
-	pages: write
-    id-token: write
+  contents: read
+  pages: write
+  id-token: write
 
 concurrency:
   group: "pages"
@@ -16,29 +16,38 @@ concurrency:
 
 jobs:
   build:
-	runs-on: ubuntu-latest
-	defaults:
-	  run:
-		working-directory: pacman-automata
-	steps:
-	  - uses: actions/checkout@v4
-	  - uses: actions/setup-node@v4
-		with:
-		  node-version: 20
-		  cache: npm
-		  cache-dependency-path: pacman-automata/package-lock.json
-	  - run: npm ci
-	  - run: npm run build
-	  - uses: actions/upload-pages-artifact@v3
-		with:
-		  path: pacman-automata/dist
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: pacman-automata/package-lock.json
+
+      - name: Install deps
+        working-directory: pacman-automata
+        run: npm ci
+
+      - name: Build
+        working-directory: pacman-automata
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: pacman-automata/dist
 
   deploy:
-	needs: build
-	runs-on: ubuntu-latest
-	environment:
-	  name: github-pages
-	  url: ${{ steps.deployment.outputs.page_url }}
-	steps:
-	  - id: deployment
-		uses: actions/deploy-pages@v4
+    runs-on: ubuntu-latest
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
