@@ -31,7 +31,7 @@ export default function App() {
 	const [pacmanImg, setPacmanImg] = useState<HTMLImageElement | null>(null);
 	const [data, setData] = useState<DFAData | null>(null);
 	const [pastillas, setPastillas] = useState<number[][]>([]);
-	const [ganador, setGanador] = useState<boolean>(false);
+	// const [ganador, setGanador] = useState<boolean>(false);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const CELL = 55; // px por celda
 
@@ -76,7 +76,6 @@ export default function App() {
 				// Reset suave desde MUERTE
 				if (key === "R" && state === "MUERTE") {
 					setState(data.estado_inicial);
-					setGanador(false);
 					setPastillas(data.ctx.pastillas);
 					return;
 				}
@@ -89,12 +88,10 @@ export default function App() {
 				}
 
 				if (data.estados_finales.includes(next) && pastillas.length === 0) {
-					setGanador(true);
 				}
 
 				if (key === "R" && data.estados_finales.includes(state) && pastillas.length === 0) {
 					setState(data.estado_inicial);
-					setGanador(false);
 					setPastillas(data.ctx.pastillas);
 					return;
 				}
