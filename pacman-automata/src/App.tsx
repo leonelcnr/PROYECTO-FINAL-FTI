@@ -30,8 +30,9 @@ export default function App() {
 	const [fantasmaImg, setFantasmaImg] = useState<HTMLImageElement | null>(null);
 	const [pacmanImg, setPacmanImg] = useState<HTMLImageElement | null>(null);
 	const [data, setData] = useState<DFAData | null>(null);
+	const [json, setJson] = useState<DFAData | null>(null);
 	const [pastillas, setPastillas] = useState<number[][]>([]);
-	// const [ganador, setGanador] = useState<boolean>(false);
+	const [numeroMapa, setNumeroMapa] = useState<number>(0);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const CELL = 55; // px por celda
 
@@ -39,15 +40,6 @@ export default function App() {
 	useEffect(() => {
 		const load = async () => {
 			try {
-				const res = await fetch(`${import.meta.env.BASE_URL}dfa.json`);
-				if (!res.ok) {
-					throw new Error('No se pudo cargar dfa.json');
-				}
-				const data = await res.json();
-				setData(data);
-				setState(data.estado_inicial);
-				setPastillas(data.ctx.pastillas);
-
 				// cargar fantasma
 				const fantasma = new Image();
 				fantasma.src = `${import.meta.env.BASE_URL}fantasmas/fantasma2.svg`;
@@ -57,6 +49,22 @@ export default function App() {
 				const pacman = new Image();
 				pacman.src = `${import.meta.env.BASE_URL}pacman.svg`;
 				pacman.onload = () => setPacmanImg(pacman);
+
+				const res = await fetch(`${import.meta.env.BASE_URL}dfa.json`);
+				if (!res.ok) {
+					throw new Error('No se pudo cargar dfa.json');
+				}
+				const json = await res.json();
+				setJson(json);
+
+
+				if (json) {
+					const data = (json as any)[`mapa_${numeroMapa}`];
+					setNumeroMapa(numeroMapa + 1);
+					setData(data);
+					setState(data.estado_inicial);
+					setPastillas(data.ctx.pastillas);
+				};
 			} catch (err) {
 				console.error(err);
 			}
@@ -83,6 +91,10 @@ export default function App() {
 				const next = data.transiciones[state]?.[key];
 				if (next) setState(next);
 
+				if (numeroMapa === 4) {
+					setNumeroMapa(0);
+					return;
+				}
 				if (pastillas.some(a => a.toString() == next)) {
 					setPastillas(pastillas.filter(a => a.toString() != next));
 				}
@@ -91,8 +103,16 @@ export default function App() {
 				}
 
 				if (key === "R" && data.estados_finales.includes(state) && pastillas.length === 0) {
-					setState(data.estado_inicial);
-					setPastillas(data.ctx.pastillas);
+					// setState(data.estado_inicial);
+					// setPastillas(data.ctx.pastillas);
+					if (numeroMapa < 4) {
+						const data = (json as any)[`mapa_${numeroMapa}`];
+						setNumeroMapa(numeroMapa + 1);
+						setData(data);
+						setState(data.estado_inicial);
+						setPastillas(data.ctx.pastillas);
+					}
+
 					return;
 				}
 			};

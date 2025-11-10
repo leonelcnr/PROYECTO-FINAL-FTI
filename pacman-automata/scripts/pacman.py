@@ -45,14 +45,20 @@ if __name__ == "__main__":
 """.strip("\n")
 
     lista_mapas = [mapa_inicial, grid, grid2, grid3]
+    automatas = []
+    mapas = []
 
-    dfa, contexto = dfa_pacman(mapa_inicial)
-    export_dfa_to_json(dfa, contexto)
-    # turno = Turno(dfa)
-    
-    # dfa.iter_transitions()
-    # for trans in dfa.iter_transitions():
-    #     print(trans)
+    for mapa in lista_mapas:
+        dfa, contexto = dfa_pacman(mapa)
+        automatas.append(dfa)
+        mapas.append(contexto)
+        
+    export_dfa_to_json(automatas, mapas)
+        
+        # turno = Turno(dfa)
+        # dfa.iter_transitions()
+        # for trans in dfa.iter_transitions():
+        #     print(trans)
 
     
     # print("Controles: W (arriba), A (izq), S (abajo), D (der). Enter vacío para salir.\n")
