@@ -60,7 +60,9 @@ export default function App() {
 					throw new Error('No se pudo cargar dfa.json');
 				}
 				const data = await res.json();
+				console.log(data);
 				setData(data);
+				setState(data.estado_inicial);
 
 				// cargar fantasma
 				const fantasma = new Image();
