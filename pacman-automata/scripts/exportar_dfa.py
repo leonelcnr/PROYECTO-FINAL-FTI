@@ -3,7 +3,7 @@ import json
 
 def _state_str(st):
     # "MUERTE" queda igual; (x,y,mask) -> "x,y|mask"
-    return st if isinstance(st, str) else f"{st[0]},{st[1]}|{st[2]}"
+    return st if isinstance(st, str) else f"{st[0]},{st[1]}"
 
 def export_dfa_to_json(dfa, ctx, path="../public/dfa.json"):
     def to_list_pairs(s):  # {(x,y),...} -> [[x,y],...]

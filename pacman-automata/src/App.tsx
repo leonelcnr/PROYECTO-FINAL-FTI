@@ -19,13 +19,9 @@ type DFAData = {
 
 function parseState(s: string) {
 	if (s === "MUERTE") return { muerte: true } as const;
-	const [pos, maskStr] = s.split("|");
-	const [xStr, yStr] = pos.split(",");
-	return { muerte: false, x: +xStr, y: +yStr, mask: Number(maskStr) } as const;
-}
-
-function tienePastilla(mask: number, i: number) {
-	return ((mask >> i) & 1) === 1;
+	// const [pos] = s.split("|");
+	const [xStr, yStr] = s.split(",");
+	return { muerte: false, x: +xStr, y: +yStr } as const;
 }
 
 
@@ -34,8 +30,11 @@ export default function App() {
 	const [fantasmaImg, setFantasmaImg] = useState<HTMLImageElement | null>(null);
 	const [pacmanImg, setPacmanImg] = useState<HTMLImageElement | null>(null);
 	const [data, setData] = useState<DFAData | null>(null);
+	const [pastillas, setPastillas] = useState<number[][]>([]);
+	const [ganador, setGanador] = useState<boolean>(false);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const CELL = 55; // px por celda
+
 
 	useEffect(() => {
 		const load = async () => {
@@ -47,6 +46,7 @@ export default function App() {
 				const data = await res.json();
 				setData(data);
 				setState(data.estado_inicial);
+				setPastillas(data.ctx.pastillas);
 
 				// cargar fantasma
 				const fantasma = new Image();
@@ -76,15 +76,28 @@ export default function App() {
 				// Reset suave desde MUERTE
 				if (key === "R" && state === "MUERTE") {
 					setState(data.estado_inicial);
-					return;
-				}
-				if (key === "R" && state === data.estados_finales[0]) {
-					setState(data.estado_inicial);
+					setGanador(false);
+					setPastillas(data.ctx.pastillas);
 					return;
 				}
 				if (!["W", "A", "S", "D", "R"].includes(key)) return;
 				const next = data.transiciones[state]?.[key];
 				if (next) setState(next);
+
+				if (pastillas.some(a => a.toString() == next)) {
+					setPastillas(pastillas.filter(a => a.toString() != next));
+				}
+
+				if (data.estados_finales.includes(next) && pastillas.length === 0) {
+					setGanador(true);
+				}
+
+				if (key === "R" && data.estados_finales.includes(state) && pastillas.length === 0) {
+					setState(data.estado_inicial);
+					setGanador(false);
+					setPastillas(data.ctx.pastillas);
+					return;
+				}
 			};
 			window.addEventListener("keydown", onKey);
 			return () => window.removeEventListener("keydown", onKey);
@@ -152,23 +165,21 @@ export default function App() {
 
 		// estado
 		const st = parseState(state);
+		const ganador = data.estados_finales.includes(state) && pastillas.length === 0;
 
-		// pastillas restantes (según mask)
 		if (!st.muerte) {
 			g.fillStyle = "#f1c40f";
-			ctx.pastillas.forEach(([px, py], i) => {
-				if (tienePastilla(st.mask, i)) {
-					g.beginPath();
-					g.arc(
-						px * CELL + CELL / 2,
-						py * CELL + CELL / 2,
-						CELL * 0.12,
-						0,
-						Math.PI * 2
-					);
-					g.fill();
-				}
-			});
+			pastillas.forEach(([px, py]) => {
+				g.beginPath();
+				g.arc(
+					px * CELL + CELL / 2,
+					py * CELL + CELL / 2,
+					CELL * 0.12,
+					0,
+					Math.PI * 2
+				);
+				g.fill();
+			})
 		}
 
 		// inicio (S)
@@ -194,7 +205,6 @@ export default function App() {
 		}
 
 		// HUD
-		const ganador = data.estados_finales.includes(state);
 		if (ganador) {
 			g.fillStyle = "rgba(116, 255, 95, 0.85)";
 			g.fillRect(0, 0, cvs.width, cvs.height);

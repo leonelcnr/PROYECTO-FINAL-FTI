@@ -5,6 +5,17 @@ from exportar_dfa import export_dfa_to_json
 
 
 if __name__ == "__main__":
+
+
+    mapa_inicial = """
+######
+#S  G#
+# G. #
+#  G.#
+#.  E#
+######
+""".strip("\n")
+
     grid = """
 ##############
 #S .        G#
@@ -33,7 +44,9 @@ if __name__ == "__main__":
 #######################
 """.strip("\n")
 
-    dfa, contexto = dfa_pacman(grid3)
+    lista_mapas = [mapa_inicial, grid, grid2, grid3]
+
+    dfa, contexto = dfa_pacman(mapa_inicial)
     export_dfa_to_json(dfa, contexto)
     # turno = Turno(dfa)
     

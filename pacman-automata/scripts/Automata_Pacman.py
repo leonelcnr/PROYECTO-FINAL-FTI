@@ -1,5 +1,6 @@
 from collections import deque
 from automata.fa.dfa import DFA
+from automata.fa.nfa import NFA
 
 
 def mapa(mapa_str):
@@ -23,14 +24,11 @@ def mapa(mapa_str):
     if inicio is None:
         raise ValueError("Falta 'S' (inicio) en el mapa.")
     
-    # terminar de entender el bitmask
-    pastillas_index = {p:i for i,p in enumerate(pastillas)}
-    full_mask = (1 << len(pastillas)) - 1
+
     
     return {
         "inicio": inicio, "fantasmas": fantasmas, "paredes": paredes,
-        "pastillas": pastillas, "meta": meta, "altura": altura, "ancho": ancho,
-        "full_mask": full_mask, "pastillas_index": pastillas_index
+        "pastillas": pastillas, "meta": meta, "altura": altura, "ancho": ancho
     }
     
     
@@ -43,11 +41,12 @@ def dfa_pacman(mapa_str):
     def dentro_del_mapa(x,y): return 0 <= x < G["ancho"] and 0 <= y < G["altura"]
     def es_muro(x,y): return (x,y) in G["paredes"]
     def es_fantasma(x,y): return (x,y) in G["fantasmas"]
-    def es_pastilla(x,y): return (x,y) in G["pastillas_index"]
+    def es_pastilla(x,y): return (x,y) in G["pastillas"]
     def es_meta(x,y): return (x,y) == G["meta"]
     
-    q0 = (G["inicio"][0], G["inicio"][1], G["full_mask"]) # (cordenada x, cordenada y, bitmask)
+    q0 = (G["inicio"][0], G["inicio"][1]) # (cordenada x, cordenada y, bitmask)
     MUERTE = "MUERTE"
+    PASTILLA = "PASTILLA"
     
     estados = set([q0, MUERTE])
     simbolos_entrada = set(movimientos.keys() | {'R'})
@@ -65,12 +64,11 @@ def dfa_pacman(mapa_str):
     #QUE SE PUEDEN OBTENER DESDE CADA UNO DE LOS ESTADOS EN LA COLA
     
     while queue:
-        (x, y, mask) = queue.popleft()
-        transiciones [(x,y,mask)] = {}
-        mask_vacia = mask == 0
+        (x, y) = queue.popleft()
+        transiciones [(x,y)] = {}
         
-        if es_meta(x, y) and mask_vacia:
-            finals.add((x, y, mask))
+        if es_meta(x, y):
+            finals.add((x, y))
 
         # Explora movimientos posibles
         #Parte desde la posicion actual (x, y) y verifica si se puede mover en cada direccion
@@ -83,23 +81,18 @@ def dfa_pacman(mapa_str):
             nx, ny = x + dx, y + dy # x,y son las coordenadas actuales, dx, dy son los cambios en x,y
             
             if (not dentro_del_mapa(nx, ny)) or es_muro(nx, ny):
-                transiciones[(x,y,mask)][c] = (x,y,mask)
+                transiciones[(x,y)][c] = (x,y)
                 continue
             
             if es_fantasma(nx, ny):
-                transiciones[(x,y,mask)][c] = MUERTE
+                transiciones[(x,y)][c] = MUERTE
                 continue
             
-            nueva_mask = mask
-            if es_pastilla(nx, ny):
-                i = G["pastillas_index"][(nx, ny)]
-                if (nueva_mask >> i) & 1:
-                    nueva_mask = nueva_mask & ~(1 << i)
             
-            qn = (nx, ny, nueva_mask)
-            transiciones[(x,y,mask)][c] = qn    
+            qn = (nx, ny)
+            transiciones[(x,y)][c] = qn    
             
-            transiciones[(x,y,mask)]['R'] = (x, y, mask)
+            transiciones[(x,y)]['R'] = (x, y)
             
             if qn not in seen:
                 seen.add(qn)
@@ -129,7 +122,6 @@ class Turno:
         self.estado = automata.initial_state
 
     def hacer_turno(self, movimiento: str):
-        # """Avanza 1 símbolo (W/A/S/D). Devuelve el nuevo estado."""
         movimiento = movimiento.upper()
         if movimiento not in self.automata.input_symbols:
             raise ValueError(f"Símbolo inválido: {movimiento}. Usá {sorted(self.automata.input_symbols)}")
@@ -138,12 +130,7 @@ class Turno:
         return self.estado
     
     def esta_aceptado(self) -> bool:
-        # """¿Está en un estado final? (todas las pastillas comidas y en meta si corresponde)."""
         return self.estado in self.automata.final_states
     
     def resetear(self):
-        # """Volver al estado inicial."""
         self.estado = self.automata.initial_state
-
-
-
