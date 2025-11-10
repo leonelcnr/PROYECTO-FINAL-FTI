@@ -63,6 +63,7 @@ export default function App() {
 				console.log(data);
 				setData(data);
 				setState(data.estado_inicial);
+				console.log(data.estado_inicial);
 
 				// cargar fantasma
 				const fantasma = new Image();
@@ -95,6 +96,7 @@ export default function App() {
 	// teclado
 	useEffect(
 		() => {
+			console.log("segundo useEffect", data, state);
 			if (!data || !state) return;
 			const onKey = (e: KeyboardEvent) => {
 				const key = e.key.toUpperCase();
