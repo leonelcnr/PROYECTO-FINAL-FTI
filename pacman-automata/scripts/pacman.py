@@ -1,5 +1,4 @@
 from Automata_Pacman import Turno, dfa_pacman
-# from Automata_pastillas import Automata_Pastillas
 from exportar_dfa import export_dfa_to_json
 
 

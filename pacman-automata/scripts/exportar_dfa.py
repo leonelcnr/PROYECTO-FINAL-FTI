@@ -1,4 +1,3 @@
-# exportar_dfa.py
 import json
 
 def _state_str(st):

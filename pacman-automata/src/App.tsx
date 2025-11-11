@@ -12,7 +12,7 @@ type DFAData = {
 		fantasmas: number[][];
 		inicio: number[];
 		meta: number[] | null;
-		pastillas: number[][]; // el índice i define el bit i del mask
+		pastillas: number[][];
 	};
 };
 
@@ -34,7 +34,7 @@ export default function App() {
 	const [pastillas, setPastillas] = useState<number[][]>([]);
 	const [numeroMapa, setNumeroMapa] = useState<number>(0);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
-	const CELL = 55; // px por celda
+	const CELDA = 55; // px por celda
 
 
 	useEffect(() => {
@@ -57,7 +57,7 @@ export default function App() {
 				const json = await res.json();
 				setJson(json);
 
-
+				// CARGAR LOS DATOS DEL MAPA
 				if (json) {
 					const data = (json as any)[`mapa_${numeroMapa}`];
 					setNumeroMapa(numeroMapa + 1);
@@ -81,7 +81,6 @@ export default function App() {
 			if (!data || !state) return;
 			const onKey = (e: KeyboardEvent) => {
 				const key = e.key.toUpperCase();
-				// Reset suave desde MUERTE
 				if (key === "R" && state === "MUERTE") {
 					setState(data.estado_inicial);
 					setPastillas(data.ctx.pastillas);
@@ -99,12 +98,7 @@ export default function App() {
 					setPastillas(pastillas.filter(a => a.toString() != next));
 				}
 
-				if (data.estados_finales.includes(next) && pastillas.length === 0) {
-				}
-
 				if (key === "R" && data.estados_finales.includes(state) && pastillas.length === 0) {
-					// setState(data.estado_inicial);
-					// setPastillas(data.ctx.pastillas);
 					if (numeroMapa < 4) {
 						const data = (json as any)[`mapa_${numeroMapa}`];
 						setNumeroMapa(numeroMapa + 1);
@@ -112,7 +106,6 @@ export default function App() {
 						setState(data.estado_inicial);
 						setPastillas(data.ctx.pastillas);
 					}
-
 					return;
 				}
 			};
@@ -122,62 +115,54 @@ export default function App() {
 		[data, state] as unknown as any
 	);
 
-	// draw
 	useEffect(() => {
 		if (!data || !state) return;
 		const { ctx } = data;
 		const cvs = canvasRef.current!;
-		cvs.width = ctx.w * CELL;
-		cvs.height = ctx.h * CELL;
+		cvs.width = ctx.w * CELDA;
+		cvs.height = ctx.h * CELDA;
 		const g = cvs.getContext("2d")!;
 		g.clearRect(0, 0, cvs.width, cvs.height);
 
-		// fondo
 		g.fillStyle = "#111";
 		g.fillRect(0, 0, cvs.width, cvs.height);
 
-		// grilla (suave)
 		g.strokeStyle = "#222";
 		g.lineWidth = 1;
 		for (let x = 0; x <= ctx.w; x++) {
 			g.beginPath();
-			g.moveTo(x * CELL, 0);
-			g.lineTo(x * CELL, cvs.height);
+			g.moveTo(x * CELDA, 0);
+			g.lineTo(x * CELDA, cvs.height);
 			g.stroke();
 		}
 		for (let y = 0; y <= ctx.h; y++) {
 			g.beginPath();
-			g.moveTo(0, y * CELL);
-			g.lineTo(cvs.width, y * CELL);
+			g.moveTo(0, y * CELDA);
+			g.lineTo(cvs.width, y * CELDA);
 			g.stroke();
 		}
 
-		// paredes - más gruesas visualmente
 		g.fillStyle = "#5036d9";
 		ctx.paredes.forEach(([x, y]) => {
-			// Paredes con borde más grueso
-			g.fillRect(x * CELL - 2, y * CELL - 2, CELL + 4, CELL + 4);
-			// Interior más oscuro para dar efecto de profundidad
+			g.fillRect(x * CELDA - 2, y * CELDA - 2, CELDA + 4, CELDA + 4);
 			g.fillStyle = "#3a2580";
-			g.fillRect(x * CELL + 2, y * CELL + 2, CELL - 4, CELL - 4);
-			g.fillStyle = "#5036d9"; // Restaurar color para las siguientes paredes
+			g.fillRect(x * CELDA + 2, y * CELDA + 2, CELDA - 4, CELDA - 4);
+			g.fillStyle = "#5036d9";
 		});
 
-		// meta
 		if (ctx.meta) {
 			const [gx, gy] = ctx.meta;
 			g.fillStyle = "#2ecc71";
-			g.fillRect(gx * CELL, gy * CELL, CELL, CELL);
+			g.fillRect(gx * CELDA, gy * CELDA, CELDA, CELDA);
 		}
 		const pad = 6;
 		if (fantasmaImg) {
 			data.ctx.fantasmas.forEach(([x, y]) => {
-				g.drawImage(fantasmaImg, x * CELL + pad, y * CELL + pad, CELL - 2 * pad, CELL - 2 * pad);
+				g.drawImage(fantasmaImg, x * CELDA + pad, y * CELDA + pad, CELDA - 2 * pad, CELDA - 2 * pad);
 			});
 		} else {
-			// fallback si no cargó el SVG
 			g.fillStyle = "#bbff00ff";
-			data.ctx.fantasmas.forEach(([x, y]) => g.fillRect(x * CELL + pad, y * CELL + pad, CELL - 2 * pad, CELL - 2 * pad));
+			data.ctx.fantasmas.forEach(([x, y]) => g.fillRect(x * CELDA + pad, y * CELDA + pad, CELDA - 2 * pad, CELDA - 2 * pad));
 		}
 
 		// estado
@@ -189,9 +174,9 @@ export default function App() {
 			pastillas.forEach(([px, py]) => {
 				g.beginPath();
 				g.arc(
-					px * CELL + CELL / 2,
-					py * CELL + CELL / 2,
-					CELL * 0.12,
+					px * CELDA + CELDA / 2,
+					py * CELDA + CELDA / 2,
+					CELDA * 0.12,
 					0,
 					Math.PI * 2
 				);
@@ -199,15 +184,13 @@ export default function App() {
 			})
 		}
 
-		// inicio (S)
 		const [sx, sy] = ctx.inicio;
 		g.fillStyle = "#ffac2fff";
-		g.fillRect(sx * CELL, sy * CELL, CELL, CELL);
+		g.fillRect(sx * CELDA, sy * CELDA, CELDA, CELDA);
 		g.fillStyle = "white";
 		g.font = "bold 14px sans-serif";
-		g.fillText("", sx * CELL + 6, sy * CELL + 16);
+		g.fillText("", sx * CELDA + 6, sy * CELDA + 16);
 
-		// Pac-Man / estado MUERTE
 		if (st.muerte) {
 			g.fillStyle = "rgba(231, 76, 60, 0.85)";
 			g.fillRect(0, 0, cvs.width, cvs.height);
@@ -216,12 +199,11 @@ export default function App() {
 			g.fillText("MUERTE — presioná R para reiniciar", 10, 28);
 		} else {
 			if (pacmanImg) {
-				g.drawImage(pacmanImg, st.x * CELL + pad, st.y * CELL + pad, CELL - 2 * pad, CELL - 2 * pad);
+				g.drawImage(pacmanImg, st.x * CELDA + pad, st.y * CELDA + pad, CELDA - 2 * pad, CELDA - 2 * pad);
 			} else {
 			}
 		}
 
-		// HUD
 		if (ganador) {
 			g.fillStyle = "rgba(116, 255, 95, 0.85)";
 			g.fillRect(0, 0, cvs.width, cvs.height);
@@ -255,7 +237,7 @@ export default function App() {
 				{state === "MUERTE" ? (
 					<b>R = reiniciar</b>
 				) : (
-					"llegá a E comiendo todas las pastillas"
+					"llegá a M comiendo todas las pastillas"
 				)}
 			</p>
 		</div>

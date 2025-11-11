@@ -20,7 +20,6 @@ def mapa(mapa_str):
             elif c == 'G': fantasmas.add((x,y))
             elif c == '.': pastillas.append((x,y))
             elif c == 'E': meta = (x,y)
-            # espacios ' ' son transitables
     if inicio is None:
         raise ValueError("Falta 'S' (inicio) en el mapa.")
     
@@ -44,7 +43,7 @@ def dfa_pacman(mapa_str):
     def es_pastilla(x,y): return (x,y) in G["pastillas"]
     def es_meta(x,y): return (x,y) == G["meta"]
     
-    q0 = (G["inicio"][0], G["inicio"][1]) # (cordenada x, cordenada y, bitmask)
+    q0 = (G["inicio"][0], G["inicio"][1])
     MUERTE = "MUERTE"
     PASTILLA = "PASTILLA"
     
