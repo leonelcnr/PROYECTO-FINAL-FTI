@@ -196,7 +196,8 @@ export default function App() {
 			g.fillRect(0, 0, cvs.width, cvs.height);
 			g.fillStyle = "#fff";
 			g.font = "bold 22px sans-serif";
-			g.fillText("MUERTE — presioná R para reiniciar", 10, 28);
+			g.fillText("MUERTE", 10, 28);
+			g.fillText("presioná R para reiniciar", 10, 55);
 		} else {
 			if (pacmanImg) {
 				g.drawImage(pacmanImg, st.x * CELDA + pad, st.y * CELDA + pad, CELDA - 2 * pad, CELDA - 2 * pad);
@@ -209,7 +210,8 @@ export default function App() {
 			g.fillRect(0, 0, cvs.width, cvs.height);
 			g.fillStyle = "#fff";
 			g.font = "bold 22px sans-serif";
-			g.fillText("GANASTE! — presioná R para reiniciar", 10, 28);
+			g.fillText("GANASTE!", 10, 28);
+			g.fillText("presioná R para continuar", 10, 55);
 			return;
 		}
 		g.fillStyle = "#fff";
@@ -237,7 +239,7 @@ export default function App() {
 				{state === "MUERTE" ? (
 					<b>R = reiniciar</b>
 				) : (
-					"llegá a M comiendo todas las pastillas"
+					"llegá a la casilla verde comiendo todas las pastillas"
 				)}
 			</p>
 		</div>
