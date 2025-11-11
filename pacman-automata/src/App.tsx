@@ -227,7 +227,7 @@ export default function App() {
 			g.fillRect(0, 0, cvs.width, cvs.height);
 			g.fillStyle = "#fff";
 			g.font = "bold 22px sans-serif";
-			g.fillText("GANASTE! — presioná R para reiniciar", 10, 28);
+			g.fillText("GANASTE! — presioná R para ir al siguiente nivel", 10, 28);
 			return;
 		}
 		g.fillStyle = "#fff";
@@ -255,7 +255,7 @@ export default function App() {
 				{state === "MUERTE" ? (
 					<b>R = reiniciar</b>
 				) : (
-					"llegá a E comiendo todas las pastillas"
+					"llegá a la casilla verde comiendo todas las pastillas"
 				)}
 			</p>
 		</div>
