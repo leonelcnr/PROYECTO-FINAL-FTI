@@ -228,7 +228,7 @@ export default function App() {
 			g.fillStyle = "#fff";
 			g.font = "bold 22px sans-serif";
 			g.fillText("GANASTE!", 10, 28);
-			g.fillText("presioná R para ir continuar", 10, 55);
+			g.fillText("presioná R para continuar", 10, 55);
 			return;
 		}
 		g.fillStyle = "#fff";
