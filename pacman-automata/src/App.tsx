@@ -213,7 +213,8 @@ export default function App() {
 			g.fillRect(0, 0, cvs.width, cvs.height);
 			g.fillStyle = "#fff";
 			g.font = "bold 22px sans-serif";
-			g.fillText("MUERTE — presioná R para reiniciar", 10, 28);
+			g.fillText("MUERTE", 10, 28);
+			g.fillText("presioná R para reiniciar", 10, 55);
 		} else {
 			if (pacmanImg) {
 				g.drawImage(pacmanImg, st.x * CELL + pad, st.y * CELL + pad, CELL - 2 * pad, CELL - 2 * pad);
